@@ -1,12 +1,16 @@
 const { io } = require("socket.io-client");
 
+const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:3001";
+
 async function run() {
+  console.log(`Connecting to Backend at ${BACKEND_URL}...`);
+
   console.log("1. Testing Space Creation via HTTP POST...");
-  const createRes = await fetch("http://localhost:3000/api/spaces", {
+  const createRes = await fetch(`${BACKEND_URL}/api/spaces`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      title: "Team Brainstorming Session",
+      title: "Monorepo Collaboration Space",
       creatorName: "Sarah",
     }),
   });
@@ -19,8 +23,8 @@ async function run() {
   }
 
   console.log("\n2. Connecting 2 collaborative clients via Socket.IO...");
-  const socket1 = io("http://localhost:3000", { transports: ["websocket"] });
-  const socket2 = io("http://localhost:3000", { transports: ["websocket"] });
+  const socket1 = io(BACKEND_URL, { transports: ["websocket"] });
+  const socket2 = io(BACKEND_URL, { transports: ["websocket"] });
 
   await new Promise((resolve) => socket1.on("connect", resolve));
   await new Promise((resolve) => socket2.on("connect", resolve));
@@ -41,20 +45,20 @@ async function run() {
   await new Promise((resolve) => {
     socket2.on("collaborator-joined", (data) => {
       console.log("Client 2 observed collaborator-joined:", data.user.name);
-      resolve();
+      resolve(data);
     });
     // In case already present in space-init
     socket2.on("space-init", (data) => {
       console.log("Client 2 received space-init with collaborators:", data.collaborators.length);
       if (data.collaborators.some((c) => c.name === "Sarah")) {
-        resolve();
+        resolve(data);
       }
     });
   });
 
   console.log("\n3. Testing Real-Time Content Sync...");
-  const updatedHtml = "<p>Real-time collaborative edits from Sarah!</p>";
-  
+  const updatedHtml = "<p>Real-time collaborative edits from Sarah in Turborepo!</p>";
+
   const contentPromise = new Promise((resolve) => {
     socket2.on("content-update", (data) => {
       console.log("Client 2 received live content update:", data.content);
@@ -65,7 +69,7 @@ async function run() {
   socket1.emit("content-change", {
     spaceId: space.id,
     content: updatedHtml,
-    plainText: "Real-time collaborative edits from Sarah!",
+    plainText: "Real-time collaborative edits from Sarah in Turborepo!",
     senderId: "usr_1",
     version: 1,
   });
@@ -90,21 +94,22 @@ async function run() {
   // Sarah clicks "Destroy Space"
   socket1.emit("destroy-space", {
     spaceId: space.id,
-    userId: "usr_1",
     userName: "Sarah",
   });
 
   await Promise.all([destroyPromise1, destroyPromise2]);
 
   console.log("\n5. Verifying space is purged from API...");
-  const verifyRes = await fetch(`http://localhost:3000/api/spaces/${space.id}`);
+  const verifyRes = await fetch(`${BACKEND_URL}/api/spaces/${space.id}`);
   console.log("Fetch destroyed space HTTP status:", verifyRes.status, "(expected 404)");
 
   socket1.disconnect();
   socket2.disconnect();
 
   if (verifyRes.status === 404) {
-    console.log("\n ALL REAL-TIME COLLABORATION & DESTRUCTION TESTS PASSED SUCCESSFULLY!");
+    console.log(
+      "\n✅ ALL REAL-TIME COLLABORATION & DESTRUCTION TESTS PASSED SUCCESSFULLY IN TURBOREPO!"
+    );
     process.exit(0);
   } else {
     throw new Error("Space was not purged!");
