@@ -1,0 +1,13 @@
+{
+  "spaces": {
+    "welcome-space": {
+      "id": "welcome-space",
+      "title": "Welcome to Collaborative Docs",
+      "content": "<h1>Welcome to Your Collaborative Space</h1>\n<p>This is a real-time collaborative text editor built with <strong>Next.js</strong>. Multiple people can join this space simultaneously and edit content together in real-time.</p>\n<h2>✨ Features</h2>\n<ul>\n  <li><strong>Real-time synchronization:</strong> See updates as collaborators type.</li>\n  <li><strong>Active presence:</strong> Check the collaborator avatars in the header to see who is currently in this space.</li>\n  <li><strong>Rich formatting:</strong> Headings, bold, italic, underline, lists, highlights, code blocks, and alignments.</li>\n  <li><strong>Space Lifecycle:</strong> Share the link to invite teammates, or click <em>Destroy Space</em> to permanently purge this room for everyone.</li>\n  <li><strong>Export options:</strong> Download your document as Markdown, Plain text, or HTML at any time.</li>\n</ul>\n<blockquote>Tip: Open this URL in another browser tab or share it with a friend to experience real-time multi-user editing!</blockquote>",
+      "plainText": "Welcome to Your Collaborative Space. Real-time text editor with multi-user collaboration.",
+      "createdAt": "2026-10-10T13:14:10.907Z",
+      "updatedAt": "2026-10-10T13:14:10.907Z",
+      "creatorName": "System"
+    }
+  }
+}
